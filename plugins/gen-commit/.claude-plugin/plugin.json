@@ -1,5 +1,0 @@
-{
-  "name": "gen-commit",
-  "description": "根据项目的实际提交历史，生成符合规范的提交信息",
-  "version": "1.0.0"
-}

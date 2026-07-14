@@ -5,46 +5,10 @@
   },
   "plugins": [
     {
-      "name": "dev-flow",
-      "source": "./plugins/dev-flow",
-      "description": "完整的研发流程：方案设计 → 实施 → 审查 → 测试 → 修复 → 文档更新",
-      "category": "workflow"
-    },
-    {
-      "name": "solution-design",
-      "source": "./plugins/solution-design",
-      "description": "需求方案设计：分析需求、设计技术方案、输出实施步骤",
-      "category": "workflow"
-    },
-    {
-      "name": "gen-commit",
-      "source": "./plugins/gen-commit",
-      "description": "根据项目的实际提交历史，生成符合规范的提交信息",
-      "category": "utility"
-    },
-    {
-      "name": "code-reviewer",
-      "source": "./plugins/code-reviewer",
-      "description": "审查代码的正确性、安全性和可维护性。具体审查标准由项目 rules/ 提供",
-      "category": "quality"
-    },
-    {
-      "name": "feature-developer",
-      "source": "./plugins/feature-developer",
-      "description": "根据设计方案实施功能代码，严格遵循项目规范",
+      "name": "dev",
+      "source": "./plugins/dev",
+      "description": "通用研发工具集：dev-flow 研发流程、solution-design 方案设计、gen-commit 提交信息生成，以及 code-reviewer / feature-developer / test-reviewer / doc-maintainer Agent",
       "category": "development"
-    },
-    {
-      "name": "test-reviewer",
-      "source": "./plugins/test-reviewer",
-      "description": "对功能变更进行测试验证和风险评估",
-      "category": "quality"
-    },
-    {
-      "name": "doc-maintainer",
-      "source": "./plugins/doc-maintainer",
-      "description": "根据代码变更更新 CLAUDE.md、rules、skills 等文档",
-      "category": "maintenance"
     }
   ]
 }

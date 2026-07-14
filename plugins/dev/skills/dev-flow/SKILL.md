@@ -43,5 +43,5 @@ description: 完整的研发流程：方案设计 → 实施 → 审查 → 测�
 
 ## 依赖说明
 
-本流程依赖以下 plugin agent：`feature-developer`、`code-reviewer`、`test-reviewer`、`doc-maintainer`。
+本流程依赖插件中的 `code-reviewer`、`feature-developer`、`test-reviewer`、`doc-maintainer` Agent。
 此外需要项目提供一个架构设计 agent（如 `system-architect`），负责方案设计阶段的技术分析。

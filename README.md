@@ -14,19 +14,9 @@
 | `test-reviewer` | Agent | 测试验证：代码走查、边界分析、回归评估 | dev-flow 自动调用 |
 | `doc-maintainer` | Agent | 文档维护：增量更新 CLAUDE.md、rules、skills | dev-flow 自动调用 |
 
-## 安装
+## 新项目接入（管理员配置一次）
 
-```bash
-# 1. 添加 marketplace
-/plugin marketplace add yztcit/claude_plugins
-
-# 2. 安装插件
-/plugin install dev@lui-tools
-```
-
-## 在项目中自动配置
-
-在 `.claude/settings.json` 中添加：
+在项目根目录创建 `.claude/settings.json`：
 
 ```json
 {
@@ -44,36 +34,45 @@
 }
 ```
 
-## 新项目接入指南
+然后手动安装一次插件（仅首次）：
 
-### 第一步：安装插件
+```
+/plugin install dev@lui-tools --scope project
+```
 
-在新项目根目录创建 `.claude/settings.json`，复制上面的自动配置 JSON。
+`--scope project` 会把安装记录写入 `.claude/settings.json`，这样 `git push` 后其他队友就能共享。
 
-### 第二步：创建项目规范（最少配置）
+### 团队成员首次打开项目
 
-插件 Agent 依赖 `rules/` 中的规范来指导审查和实施。最少需要以下文件：
+1. 打开项目，信任目录 → `lui-tools` marketplace 自动注册
+2. **仍需执行一次** `/plugin install dev@lui-tools`（`enabledPlugins` 只负责启用，不负责安装）
+3. 之后无需任何操作，`/plugin update` 自动拉取更新
+
+### 更新插件
+
+```
+/plugin update
+```
+
+## 创建项目规范（按需）
+
+插件 Agent 依赖 `rules/` 中的规范来指导审查和实施。建议最少创建以下文件：
 
 **`.claude/rules/code-style.md`** — 告诉 Agent 你的项目用什么语言、什么日志工具、什么命名风格。
 
 **`.claude/rules/architecture.md`** — 告诉 Agent 项目的模块边界和依赖方向。
 
-### 第三步：创建 CLAUDE.md
-
-用 `/init` 自动生成，然后补充项目特有的构建命令、架构概览、关键类等。
-
-### 第四步：创建项目特有 Agent（按需）
+然后创建 `CLAUDE.md`（`/init` 自动生成），补充项目特有的构建命令、架构概览、关键类。
 
 如果项目需要架构设计 Agent（dev-flow 的方案设计阶段会用到），创建 `.claude/agents/system-architect.md`。
 
-### 验证
+## 验证
 
-```bash
-# 查看已安装插件
+```
 /help
 ```
 
-应该看到 `dev:dev-flow`、`dev:solution-design`、`dev:gen-commit` 等 Skill 可用。
+应该看到 `dev:dev-flow`、`dev:solution-design`、`dev:gen-commit` 三个 Skill。
 
 ### 插件与项目的分工
 

@@ -1,7 +1,7 @@
 ---
 name: doc-maintainer
 description: 根据代码变更更新 CLAUDE.md、rules、skills 等文档
-model: haiku
+
 tools: "*"
 ---
 

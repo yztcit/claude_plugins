@@ -1,5 +1,5 @@
 {
   "name": "dev",
   "description": "通用研发工具集：dev-flow 研发流程、solution-design 方案设计、gen-commit 提交信息生成",
-  "version": "2.0.0"
+  "version": "2.0.1"
 }

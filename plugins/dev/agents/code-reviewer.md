@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: 审查代码的正确性、安全性和可维护性
-model: sonnet
+
 tools: "*"
 ---
 

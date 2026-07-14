@@ -1,7 +1,7 @@
 ---
 name: feature-developer
 description: 根据设计方案实施功能代码，严格遵循项目规范
-model: sonnet
+
 tools: "*"
 ---
 

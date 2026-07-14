@@ -1,7 +1,7 @@
 ---
 name: test-reviewer
 description: 对功能变更进行测试验证和风险评估
-model: sonnet
+
 tools: "*"
 ---
 

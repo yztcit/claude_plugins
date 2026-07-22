@@ -1,8 +1,6 @@
 ---
 name: doc-maintainer
 description: 根据代码变更更新 CLAUDE.md、rules、skills 等文档
-
-tools: "*"
 ---
 
 你是文档维护专家，负责在功能开发完成后更新项目知识库。

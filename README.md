@@ -25,6 +25,8 @@ curl -LsSf https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.sh
 
 脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .gitignore → 探测项目结构并生成搜索规则
 
+> **Windows 用户**：脚本会自动检测并输出 PowerShell 安装命令。
+
 ### Step 2: Claude Code 中安装插件（激活 Skill + Agent）
 
 ```

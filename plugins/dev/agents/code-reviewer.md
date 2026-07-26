@@ -21,8 +21,8 @@ description: 审查代码的正确性、安全性和可维护性
 ## 代码搜索策略
 
 审查时需要查找相关代码（如引用方、接口定义、类似实现）时：
-1. **优先使用代码图谱**（如已接入 Graphify）：`graphify search "关键词"` 精准定位
-2. **查影响范围**：`graphify deps <file>` 确认变更是否影响上下游
+1. **优先使用代码图谱**（如已接入 Graphify）：`graphify query "关键词"` 精准定位
+2. **查影响范围**：`graphify affected "<文件/符号>"` 确认变更是否影响上下游
 3. 图谱不可用时才用 grep/find 搜索
 
 ## 输出格式

@@ -73,11 +73,11 @@ fi
 # --- Step 3: 初始化索引 ---
 info "Step 3/6: 初始化代码图谱索引..."
 
-if [ -d "graphify" ] && [ "$(ls -A graphify/ 2>/dev/null)" ]; then
+if [ -d "graphify-out" ] && [ "$(ls -A graphify-out/ 2>/dev/null)" ]; then
   ok "图谱索引已存在，跳过初始化"
 else
-  info "首次索引可能需要几分钟..."
-  graphify init
+  info "首次索引可能需要几分钟（需要 LLM API key）..."
+  graphify extract .
   ok "图谱索引完成"
 fi
 
@@ -91,17 +91,17 @@ ok "Git Hook 绑定完成"
 info "Step 5/6: 配置 .gitignore..."
 
 GITIGNORE=".gitignore"
-GRAPHIFY_ENTRY="graphify/"
+GRAPHIFY_ENTRY="graphify-out/"
 
 if [ -f "$GITIGNORE" ] && grep -qF "$GRAPHIFY_ENTRY" "$GITIGNORE" 2>/dev/null; then
-  ok ".gitignore 已包含 graphify/ 排除规则"
+  ok ".gitignore 已包含 graphify-out/ 排除规则"
 else
   {
     echo ""
     echo "# Graphify 代码图谱索引（自动生成，不提交）"
     echo "$GRAPHIFY_ENTRY"
   } >> "$GITIGNORE"
-  ok "已添加 graphify/ 到 .gitignore"
+  ok "已添加 graphify-out/ 到 .gitignore"
 fi
 
 # --- Step 6: 生成搜索规则 ---
@@ -133,7 +133,7 @@ else
      -not -path "*/.git/*" \
      -not -path "*/dist/*" \
      -not -path "*/build/*" \
-     -not -path "*/graphify/*" \
+     -not -path "*/graphify-out/*" \
      -not -path "*/.claude/*" \
      -not -path "*/vendor/*" \
      -not -path "*/__pycache__/*" \
@@ -177,15 +177,15 @@ $(echo -e "$PATHS")
 
 | 优先级 | 方式 | 适用场景 | 命令示例 |
 |--------|------|---------|---------|
-| 1 | 代码图谱 | 找文件/符号/依赖关系 | \`graphify search "UserService"\` |
+| 1 | 代码图谱 | 找文件/符号/依赖/影响范围 | \`graphify query "UserService 在哪里定义"\` |
 | 2 | 结构化搜索 | 图谱无结果时的精确查找 | \`grep -rn "symbol" <源码目录>/\` |
 | 3 | Read 文件 | 已锁定目标后读内容 | Read tool |
 
 ## 搜索流程
 
-1. **先查图谱锁定文件** — \`graphify search "<关键词>"\` 获取相关文件列表和依赖关系
+1. **先查图谱锁定文件** — \`graphify query "<问题>"\` 获取相关文件列表和关系
 2. **再 Read 目标文件** — 只读图谱锁定的文件，不做盲搜式多轮 read
-3. **查依赖关系** — \`graphify deps <file>\` 了解上下游引用，避免改一处漏一片
+3. **查影响范围** — \`graphify affected "<改动的文件/符号>"\` 了解上下游，避免改一处漏一片
 
 ## 适用场景
 
@@ -201,7 +201,7 @@ $(echo -e "$PATHS")
 ## 禁止事项
 
 - 图谱可用时不做多轮关键词盲搜
-- 不将 \`graphify/\` 目录提交到 git
+- 不将 \`graphify-out/\` 目录提交到 git
 RULEEOF
 
   ok "规则文件已生成: $RULE_FILE"
@@ -218,7 +218,7 @@ echo ""
 echo "已完成的配置:"
 echo "  ✓ uv 包管理器"
 echo "  ✓ graphify 代码图谱"
-echo "  ✓ AST 索引 (graphify/)"
+echo "  ✓ AST 索引 (graphify-out/)"
 echo "  ✓ Git Hook (自动增量更新)"
 echo "  ✓ .gitignore (排除索引目录)"
 echo "  ✓ 搜索规则 (.claude/rules/code-search.md)"

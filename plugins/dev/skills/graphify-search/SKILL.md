@@ -10,7 +10,7 @@ description: 一键接入 Graphify 代码图谱：安装工具、初始化索引
 ## 前置检查
 
 1. 检查 `graphify` 是否已安装：`graphify --version`
-2. 检查索引是否已建：`ls graphify/` 目录是否存在
+2. 检查索引是否已建：`ls graphify-out/` 目录是否存在
 
 如果都已就绪，跳到「注入规则」步骤。
 
@@ -33,10 +33,10 @@ uv tool install graphifyy
 ## Step 3: 初始化索引
 
 ```bash
-graphify init
+graphify extract .
 ```
 
-在项目根目录生成 `graphify/` 目录，包含 AST 索引和依赖关系数据。首次索引可能需要几分钟。
+在项目根目录生成 `graphify-out/` 目录，包含 AST 索引和语义分析数据。首次索引需要 LLM API key（用于语义聚类），可能需要几分钟。
 
 ## Step 4: 绑定 Git Hook（增量更新）
 
@@ -52,7 +52,7 @@ graphify hook install
 
 ```
 # Graphify 代码图谱索引（自动生成，不提交）
-graphify/
+graphify-out/
 ```
 
 ## Step 6: 注入搜索规则
@@ -64,7 +64,7 @@ graphify/
 ```bash
 # 找到源码目录（排除 node_modules, .git, build 产物等）
 find . -type f \( -name "*.ts" -o -name "*.vue" -o -name "*.py" -o -name "*.go" -o -name "*.java" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.rs" -o -name "*.swift" \) \
-  -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/dist/*" -not -path "*/build/*" -not -path "*/graphify/*" \
+  -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/dist/*" -not -path "*/build/*" -not -path "*/graphify-out/*" \
   | head -20
 ```
 
@@ -90,15 +90,15 @@ paths:
 
 | 优先级 | 方式 | 适用场景 | 命令示例 |
 |--------|------|---------|---------|
-| 1 | 代码图谱 | 找文件/符号/依赖关系 | `graphify search "UserService"` |
+| 1 | 代码图谱 | 找文件/符号/依赖/影响范围 | `graphify query "UserService 在哪里定义"` |
 | 2 | 结构化搜索 | 图谱无结果时的精确查找 | `grep -rn "symbol" <源码目录>/` |
 | 3 | Read 文件 | 已锁定目标后读内容 | Read tool |
 
 ## 搜索流程
 
-1. **先查图谱锁定文件** — `graphify search "<关键词>"` 获取相关文件列表和依赖关系
+1. **先查图谱锁定文件** — `graphify query "<问题>"` 获取相关文件列表和关系
 2. **再 Read 目标文件** — 只读图谱锁定的文件，不做盲搜式多轮 read
-3. **查依赖关系** — `graphify deps <file>` 了解上下游引用，避免改一处漏一片
+3. **查影响范围** — `graphify affected "<改动的文件/符号>"` 了解上下游，避免改一处漏一片
 
 ## 适用场景
 
@@ -114,7 +114,7 @@ paths:
 ## 禁止事项
 
 - 图谱可用时不做多轮关键词盲搜
-- 不将 `graphify/` 目录提交到 git
+- 不将 `graphify-out/` 目录提交到 git
 ```
 
 ### 6.3 示例
@@ -131,7 +131,7 @@ paths:
 
 ## 验证
 
-执行 `graphify search "一个你知道存在的类名"`，应返回包含该类的文件列表。
+执行 `graphify query "一个你知道存在的类名"`，应返回包含该类的文件列表。
 
 ## 效果
 

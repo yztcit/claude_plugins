@@ -21,8 +21,8 @@ description: 根据设计方案实施功能代码，严格遵循项目规范
 ## 代码搜索策略
 
 当需要查找文件、符号或依赖关系时：
-1. **优先使用代码图谱**（如已接入 Graphify）：`graphify search "关键词"` 锁定文件，再 Read
-2. **查依赖关系**：`graphify deps <file>` 了解上下游引用
+1. **优先使用代码图谱**（如已接入 Graphify）：`graphify query "关键词"` 锁定文件，再 Read
+2. **查影响范围**：`graphify affected "<文件/符号>"` 了解上下游引用
 3. 图谱不可用时才用 grep/find 搜索
 
 ## 输出

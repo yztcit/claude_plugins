@@ -92,8 +92,8 @@ info "Step 3/6: 初始化代码图谱索引..."
 if [ -d "graphify-out" ] && [ "$(ls -A graphify-out/ 2>/dev/null)" ]; then
   ok "图谱索引已存在，跳过初始化"
 else
-  info "首次索引可能需要几分钟（需要 LLM API key）..."
-  graphify extract .
+  info "首次索引可能需要几分钟..."
+  graphify extract . --code-only
   ok "图谱索引完成"
 fi
 

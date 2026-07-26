@@ -65,8 +65,8 @@ Write-Info "Step 3/6: 初始化代码图谱索引..."
 if ((Test-Path "graphify-out") -and (Get-ChildItem "graphify-out" -ErrorAction SilentlyContinue)) {
     Write-Ok "图谱索引已存在，跳过初始化"
 } else {
-    Write-Info "首次索引可能需要几分钟（需要 LLM API key）..."
-    graphify extract .
+    Write-Info "首次索引可能需要几分钟..."
+    graphify extract . --code-only
     Write-Ok "图谱索引完成"
 }
 

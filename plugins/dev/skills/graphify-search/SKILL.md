@@ -33,10 +33,10 @@ uv tool install graphifyy
 ## Step 3: 初始化索引
 
 ```bash
-graphify extract .
+graphify extract . --code-only
 ```
 
-在项目根目录生成 `graphify-out/` 目录，包含 AST 索引和语义分析数据。首次索引需要 LLM API key（用于语义聚类），可能需要几分钟。
+在项目根目录生成 `graphify-out/` 目录，包含 AST 索引数据。`--code-only` 只索引代码文件（纯本地 AST，无需 API key）。如需对文档/图片做语义分析，去掉 `--code-only` 并设置对应的 LLM API key。
 
 ## Step 4: 绑定 Git Hook（增量更新）
 

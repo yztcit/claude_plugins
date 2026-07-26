@@ -19,13 +19,17 @@
 
 ### Step 1: 终端执行一键脚本（工具链 + 规则）
 
+**macOS / Linux：**
 ```bash
 curl -LsSf https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.sh | bash
 ```
 
-脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .gitignore → 探测项目结构并生成搜索规则
+**Windows (PowerShell)：**
+```powershell
+irm https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.ps1 | iex
+```
 
-> **Windows 用户**：脚本会自动检测并输出 PowerShell 安装命令。
+脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .gitignore → 探测项目结构并生成搜索规则
 
 ### Step 2: Claude Code 中安装插件（激活 Skill + Agent）
 

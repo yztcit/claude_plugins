@@ -27,14 +27,12 @@ case "$OS_TYPE" in
   Darwin) info "检测到系统: macOS" ;;
   Linux)  info "检测到系统: Linux" ;;
   MINGW*|MSYS*|CYGWIN*)
-    fail "Windows 请使用 PowerShell 执行以下命令：
-  # 安装 uv
-  powershell -ExecutionPolicy ByPass -c \"irm https://astral.sh/uv/install.ps1 | iex\"
-  # 安装 graphify
-  uv tool install graphifyy
-  # 初始化索引 + 绑定 hook
-  graphify extract .
-  graphify hook install"
+    echo ""
+    echo "Windows 请使用 PowerShell 一键脚本："
+    echo ""
+    echo "  irm https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.ps1 | iex"
+    echo ""
+    exit 0
     ;;
   *) warn "未识别的系统: $OS_TYPE，尝试继续..." ;;
 esac

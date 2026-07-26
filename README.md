@@ -29,7 +29,23 @@ curl -LsSf https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.sh
 irm https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.ps1 | iex
 ```
 
-脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .gitignore → 探测项目结构并生成搜索规则
+脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .gitignore → 探测项目结构并生成搜索规则 → 配置 Claude Code 插件 marketplace
+
+> **网络超时？** 安装 uv 和 graphify 需要从 GitHub 下载，国内网络可能超时。执行脚本前先配置终端代理（一次性，关闭终端即失效）：
+>
+> **macOS / Linux：**
+> ```bash
+> export https_proxy=http://127.0.0.1:你的代理端口
+> export http_proxy=http://127.0.0.1:你的代理端口
+> ```
+>
+> **Windows (PowerShell)：**
+> ```powershell
+> $env:HTTPS_PROXY="http://127.0.0.1:你的代理端口"
+> $env:HTTP_PROXY="http://127.0.0.1:你的代理端口"
+> ```
+>
+> 常见代理端口：Clash 7890、V2Ray 10809、Shadowsocks 1080。端口号在代理软件设置中查看。
 
 ### Step 2: Claude Code 中安装插件（激活 Skill + Agent）
 

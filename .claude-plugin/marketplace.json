@@ -7,7 +7,7 @@
     {
       "name": "dev",
       "source": "./plugins/dev",
-      "description": "通用研发工具集：dev-flow 研发流程、solution-design 方案设计、gen-commit 提交信息生成，以及 code-reviewer / feature-developer / test-reviewer / doc-maintainer Agent",
+      "description": "通用研发工具集：dev-flow 研发流程、solution-design 方案设计、gen-commit 提交信息生成、graphify-search 代码图谱接入，以及 code-reviewer / feature-developer / test-reviewer / doc-maintainer Agent",
       "category": "development"
     }
   ]

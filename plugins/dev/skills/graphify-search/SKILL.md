@@ -129,6 +129,28 @@ paths:
 | Monorepo | `"packages/*/src/**/*.ts"` |
 | Java 项目 | `"src/main/java/**/*.java"` |
 
+## Step 7: 配置 Claude Code 插件 marketplace
+
+在 `.claude/settings.json` 中添加 marketplace 配置（如已有则合并，不覆盖）：
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "lui-tools": {
+      "source": {
+        "source": "github",
+        "repo": "yztcit/claude_plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "dev@lui-tools": true
+  }
+}
+```
+
+然后在 Claude Code 中执行一次 `/plugin install dev@lui-tools --scope project`。
+
 ## 验证
 
 执行 `graphify query "一个你知道存在的类名"`，应返回包含该类的文件列表。

@@ -25,7 +25,7 @@ Write-Host "========================================"
 Write-Host ""
 
 # --- Step 1: 安装 uv ---
-Write-Info "Step 1/6: 检查 uv..."
+Write-Info "Step 1/7: 检查 uv..."
 
 if (Get-Command uv -ErrorAction SilentlyContinue) {
     $uvVersion = uv --version
@@ -44,7 +44,7 @@ if (Get-Command uv -ErrorAction SilentlyContinue) {
 }
 
 # --- Step 2: 安装 graphify ---
-Write-Info "Step 2/6: 检查 graphify..."
+Write-Info "Step 2/7: 检查 graphify..."
 
 if (Get-Command graphify -ErrorAction SilentlyContinue) {
     Write-Ok "graphify 已安装"
@@ -60,7 +60,7 @@ if (Get-Command graphify -ErrorAction SilentlyContinue) {
 }
 
 # --- Step 3: 初始化索引 ---
-Write-Info "Step 3/6: 初始化代码图谱索引..."
+Write-Info "Step 3/7: 初始化代码图谱索引..."
 
 if ((Test-Path "graphify-out") -and (Get-ChildItem "graphify-out" -ErrorAction SilentlyContinue)) {
     Write-Ok "图谱索引已存在，跳过初始化"
@@ -71,13 +71,13 @@ if ((Test-Path "graphify-out") -and (Get-ChildItem "graphify-out" -ErrorAction S
 }
 
 # --- Step 4: 绑定 Git Hook ---
-Write-Info "Step 4/6: 绑定 Git Hook (post-commit + post-checkout)..."
+Write-Info "Step 4/7: 绑定 Git Hook (post-commit + post-checkout)..."
 
 graphify hook install
 Write-Ok "Git Hook 绑定完成"
 
 # --- Step 5: 配置 .gitignore ---
-Write-Info "Step 5/6: 配置 .gitignore..."
+Write-Info "Step 5/7: 配置 .gitignore..."
 
 $gitignorePath = ".gitignore"
 $graphifyEntry = "graphify-out/"
@@ -92,7 +92,7 @@ if ((Test-Path $gitignorePath) -and (Select-String -Path $gitignorePath -Pattern
 }
 
 # --- Step 6: 生成搜索规则 ---
-Write-Info "Step 6/6: 生成代码搜索规则..."
+Write-Info "Step 6/7: 生成代码搜索规则..."
 
 $rulesDir = ".claude\rules"
 $ruleFile = "$rulesDir\code-search.md"
@@ -185,6 +185,55 @@ $pathsStr
     $paths | ForEach-Object { Write-Host "  $_" }
 }
 
+# --- Step 7: 配置 Claude Code 插件 ---
+Write-Info "Step 7/7: 配置 Claude Code 插件 marketplace..."
+
+$settingsDir = ".claude"
+$settingsFile = "$settingsDir\settings.json"
+
+if (-not (Test-Path $settingsDir)) {
+    New-Item -ItemType Directory -Path $settingsDir -Force | Out-Null
+}
+
+if (Test-Path $settingsFile) {
+    $cfg = Get-Content $settingsFile -Raw | ConvertFrom-Json
+
+    # 添加 marketplace
+    if (-not $cfg.extraKnownMarketplaces) {
+        $cfg | Add-Member -NotePropertyName "extraKnownMarketplaces" -NotePropertyValue @{} -Force
+    }
+    $cfg.extraKnownMarketplaces | Add-Member -NotePropertyName "lui-tools" -NotePropertyValue @{
+        source = @{ source = "github"; repo = "yztcit/claude_plugins" }
+    } -Force
+
+    # 添加 enabledPlugins
+    if (-not $cfg.enabledPlugins) {
+        $cfg | Add-Member -NotePropertyName "enabledPlugins" -NotePropertyValue @{} -Force
+    }
+    $cfg.enabledPlugins | Add-Member -NotePropertyName "dev@lui-tools" -NotePropertyValue $true -Force
+
+    $cfg | ConvertTo-Json -Depth 10 | Set-Content $settingsFile -Encoding UTF8
+    Write-Ok "settings.json 已更新（marketplace + enabledPlugins）"
+} else {
+    $settingsContent = @'
+{
+  "extraKnownMarketplaces": {
+    "lui-tools": {
+      "source": {
+        "source": "github",
+        "repo": "yztcit/claude_plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "dev@lui-tools": true
+  }
+}
+'@
+    Set-Content -Path $settingsFile -Value $settingsContent -Encoding UTF8
+    Write-Ok "settings.json 已创建"
+}
+
 # --- 完成 ---
 Write-Host ""
 Write-Host "========================================"
@@ -198,9 +247,10 @@ Write-Host "  ✓ AST 索引 (graphify-out/)"
 Write-Host "  ✓ Git Hook (自动增量更新)"
 Write-Host "  ✓ .gitignore (排除索引目录)"
 Write-Host "  ✓ 搜索规则 (.claude/rules/code-search.md)"
+Write-Host "  ✓ Claude Code 插件 marketplace"
 Write-Host ""
-Write-Host "还需要在 Claude Code 中执行:"
-Write-Host "  /plugin install dev@lui-tools"
+Write-Host "还需要在 Claude Code 中执行一次（仅首次）:"
+Write-Host "  /plugin install dev@lui-tools --scope project"
 Write-Host ""
 Write-Host "之后 Agent 搜索代码时会自动优先使用图谱。"
 Write-Host ""

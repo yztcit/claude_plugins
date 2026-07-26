@@ -54,7 +54,7 @@ echo "========================================"
 echo ""
 
 # --- Step 1: 安装 uv ---
-info "Step 1/6: 检查 uv..."
+info "Step 1/7: 检查 uv..."
 
 if command -v uv &>/dev/null; then
   ok "uv 已安装 ($(uv --version))"
@@ -71,7 +71,7 @@ else
 fi
 
 # --- Step 2: 安装 graphify ---
-info "Step 2/6: 检查 graphify..."
+info "Step 2/7: 检查 graphify..."
 
 if command -v graphify &>/dev/null; then
   ok "graphify 已安装"
@@ -87,7 +87,7 @@ else
 fi
 
 # --- Step 3: 初始化索引 ---
-info "Step 3/6: 初始化代码图谱索引..."
+info "Step 3/7: 初始化代码图谱索引..."
 
 if [ -d "graphify-out" ] && [ "$(ls -A graphify-out/ 2>/dev/null)" ]; then
   ok "图谱索引已存在，跳过初始化"
@@ -98,13 +98,13 @@ else
 fi
 
 # --- Step 4: 绑定 Git Hook ---
-info "Step 4/6: 绑定 Git Hook (post-commit + post-checkout)..."
+info "Step 4/7: 绑定 Git Hook (post-commit + post-checkout)..."
 
 graphify hook install
 ok "Git Hook 绑定完成"
 
 # --- Step 5: 配置 .gitignore ---
-info "Step 5/6: 配置 .gitignore..."
+info "Step 5/7: 配置 .gitignore..."
 
 GITIGNORE=".gitignore"
 GRAPHIFY_ENTRY="graphify-out/"
@@ -121,7 +121,7 @@ else
 fi
 
 # --- Step 6: 生成搜索规则 ---
-info "Step 6/6: 生成代码搜索规则..."
+info "Step 6/7: 生成代码搜索规则..."
 
 RULES_DIR=".claude/rules"
 RULE_FILE="$RULES_DIR/code-search.md"
@@ -225,6 +225,57 @@ RULEEOF
   echo -e "$PATHS" | sed 's/^/  /'
 fi
 
+# --- Step 7: 配置 Claude Code 插件 ---
+info "Step 7/7: 配置 Claude Code 插件 marketplace..."
+
+SETTINGS_FILE=".claude/settings.json"
+mkdir -p ".claude"
+
+if [ -f "$SETTINGS_FILE" ]; then
+  # 用 python3 合并 JSON，保留已有配置
+  python3 -c "
+import json, sys
+with open('$SETTINGS_FILE', 'r') as f:
+    cfg = json.load(f)
+
+# 添加 marketplace
+cfg.setdefault('extraKnownMarketplaces', {})
+cfg['extraKnownMarketplaces']['lui-tools'] = {
+    'source': {'source': 'github', 'repo': 'yztcit/claude_plugins'}
+}
+
+# 添加 enabledPlugins
+cfg.setdefault('enabledPlugins', {})
+cfg['enabledPlugins']['dev@lui-tools'] = True
+
+with open('$SETTINGS_FILE', 'w') as f:
+    json.dump(cfg, f, indent=2)
+    f.write('\n')
+" 2>/dev/null
+  if [ $? -eq 0 ]; then
+    ok "settings.json 已更新（marketplace + enabledPlugins）"
+  else
+    warn "settings.json 更新失败，请手动添加 marketplace 配置"
+  fi
+else
+  cat > "$SETTINGS_FILE" << 'SETTINGSEOF'
+{
+  "extraKnownMarketplaces": {
+    "lui-tools": {
+      "source": {
+        "source": "github",
+        "repo": "yztcit/claude_plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "dev@lui-tools": true
+  }
+}
+SETTINGSEOF
+  ok "settings.json 已创建"
+fi
+
 # --- 完成 ---
 echo ""
 echo "========================================"
@@ -238,9 +289,10 @@ echo "  ✓ AST 索引 (graphify-out/)"
 echo "  ✓ Git Hook (自动增量更新)"
 echo "  ✓ .gitignore (排除索引目录)"
 echo "  ✓ 搜索规则 (.claude/rules/code-search.md)"
+echo "  ✓ Claude Code 插件 marketplace"
 echo ""
-echo "还需要在 Claude Code 中执行:"
-echo "  /plugin install dev@lui-tools"
+echo "还需要在 Claude Code 中执行一次（仅首次）:"
+echo "  /plugin install dev@lui-tools --scope project"
 echo ""
 echo "之后 Agent 搜索代码时会自动优先使用图谱。"
 echo ""

@@ -107,14 +107,27 @@ paths:
 - 查找 symbol / class / function 定义位置
 - 新需求开发前的代码探索
 
+## 前置检查（强制）
+
+**在执行任何 `grep`/`find`/`Read` 搜索之前，必须先尝试 `graphify query`。**
+
+判断流程：
+1. 需要定位代码 → 先 `graphify query "问题"`
+2. 图谱返回了相关文件 → 直接 Read，不走 grep
+3. 图谱无结果或结果不相关 → 降级到 grep/find
+4. 需要了解改动影响 → `graphify affected "文件/符号"`
+
+⚠️ 如果第一个搜索命令是 `grep` 而非 `graphify`，说明跳过了前置检查。
+
 ## 图谱不可用时
 
 若 `graphify` 命令不存在或索引未建，按传统方式搜索（find/grep → read）。
 
 ## 禁止事项
 
-- 图谱可用时不做多轮关键词盲搜
-- 不将 `graphify-out/` 目录提交到 git
+- ❌ 图谱可用时第一个搜索命令就用 `grep`/`find`（必须先 `graphify query`）
+- ❌ 图谱可用时不做多轮关键词盲搜
+- ❌ 不将 `graphify-out/` 目录提交到 git
 ```
 
 ### 6.3 示例

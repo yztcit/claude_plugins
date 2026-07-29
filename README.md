@@ -1,6 +1,6 @@
 # claude_plugins
 
-通用 Claude Code 研发工具集插件仓库。一个 `dev` 插件，打包 4 个 Skill + 4 个 Agent。
+通用 Claude Code 研发工具集插件仓库。一个 `dev` 插件，打包 5 个 Skill + 5 个 Agent。
 
 ## 插件内容
 
@@ -10,7 +10,9 @@
 | `solution-design` | Skill | 需求方案设计：分析需求、设计方案、输出步骤 | `/dev:solution-design` |
 | `gen-commit` | Skill | 根据提交历史，生成符合项目规范的提交信息 | `/dev:gen-commit` |
 | `graphify-search` | Skill | 一键接入 Graphify 代码图谱：安装→索引→git hook→注入搜索规则 | `/dev:graphify-search` |
-| `code-reviewer` | Agent | 代码审查：正确性、安全性、可维护性 | dev-flow 自动调用 |
+| `code-review` | Skill | 并行代码审查（bug 猎手 + 简化专家），带置信度分级 | `/dev:code-review` |
+| `code-reviewer` | Agent | Bug 猎手：正确性、安全性、可维护性、架构合规 | dev-flow / code-review 调用 |
+| `code-simplifier` | Agent | 简化专家：重复代码、过度工程、死代码、抽象泄漏 | code-review 调用 |
 | `feature-developer` | Agent | 功能实施：按方案编写代码，遵循项目规范 | dev-flow 自动调用 |
 | `test-reviewer` | Agent | 测试验证：代码走查、边界分析、回归评估 | dev-flow 自动调用 |
 | `doc-maintainer` | Agent | 文档维护：增量更新 CLAUDE.md、rules、skills | dev-flow 自动调用 |
@@ -85,7 +87,7 @@ irm https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.ps1 | iex
 /help
 ```
 
-应该看到 `dev:dev-flow`、`dev:solution-design`、`dev:gen-commit`、`dev:graphify-search` 四个 Skill。
+应该看到 `dev:dev-flow`、`dev:solution-design`、`dev:gen-commit`、`dev:graphify-search`、`dev:code-review` 五个 Skill。
 
 验证图谱是否正常工作：
 
@@ -105,7 +107,9 @@ graphify search "一个你知道存在的类名"
 │  Plugin 层 (dev@lui-tools)        │
 │  Skill: dev-flow, solution-design  │
 │         gen-commit, graphify-search│
-│  Agent: code-reviewer              │
+│         code-review                │
+│  Agent: code-reviewer (bug hunter) │
+│         code-simplifier (simplifier)│
 │         feature-developer          │
 │         test-reviewer              │
 │         doc-maintainer             │

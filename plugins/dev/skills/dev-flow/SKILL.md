@@ -24,10 +24,11 @@ description: 完整的研发流程：方案设计 → 实施 → 审查 → 测�
 - 严格遵循方案，不自行变更架构决策
 - 遇到方案未覆盖的细节主动提出
 
-### 3. 代码审查（code-reviewer）
-- 审查正确性、安全性、架构合规性
-- 结合项目 `rules/` 中的具体规范
-- 输出：按严重度排序的问题列表
+### 3. 代码审查（code-reviewer + code-simplifier 并行）
+- Bug Hunter（code-reviewer）：审查正确性、安全性、架构合规性
+- Code Simplifier（code-simplifier）：审查重复代码、过度工程、死代码、抽象泄漏
+- 两个 agent 并行执行，每个发现带置信度标注（High/Medium/Low）
+- 输出：按严重度 + 置信度排序的合并问题列表
 
 ### 4. 测试验证（test-reviewer）
 - 代码走查、对照需求验证、边界分析、回归风险评估

@@ -1,11 +1,11 @@
 ---
 name: graphify-search
-description: 一键接入 Graphify 代码图谱：安装工具、初始化索引、绑定 git hook、注入搜索规则
+description: 一键接入 Graphify 图谱：安装工具、初始化索引、绑定 git hook、注入搜索规则
 ---
 
-# Graphify 代码图谱接入
+# Graphify 图谱接入
 
-为项目接入 AST 代码图谱索引，让 Agent 搜代码时精准定位而非盲搜关键词，节省约 20% token 消耗。
+为项目接入 AST 图谱索引（代码 + 文档 + 规则），让 Agent 搜索时精准定位而非盲搜关键词，节省约 20% token 消耗。
 
 ## 前置检查
 
@@ -51,7 +51,7 @@ graphify hook install
 确保 `.gitignore` 包含：
 
 ```
-# Graphify 代码图谱索引（自动生成，不提交）
+# Graphify 图谱索引（自动生成，不提交）
 graphify-out/
 ```
 
@@ -75,7 +75,7 @@ find . -type f \( -name "*.ts" -o -name "*.vue" -o -name "*.py" -o -name "*.go" 
 
 ### 6.2 生成规则文件
 
-在项目的 `.claude/rules/` 目录创建 `code-search.md`。`paths` 必须根据 6.1 的扫描结果填写，以下为模板：
+在项目的 `.claude/rules/` 目录创建 `search.md`。`paths` 必须根据 6.1 的扫描结果填写，以下为模板：
 
 ```markdown
 ---
@@ -84,13 +84,15 @@ paths:
   - "<探测到的源码目录>/**/*.<扩展名2>"
 ---
 
-# Agent 搜索策略：代码图谱优先
+# Agent 搜索策略：图谱优先
+
+> Graphify 图谱索引代码 + 文档 + 规则，用 AST + 语义索引替代盲搜。
 
 ## 搜索优先级
 
 | 优先级 | 方式 | 适用场景 | 命令示例 |
 |--------|------|---------|---------|
-| 1 | 代码图谱 | 找文件/符号/依赖/影响范围 | `graphify query "UserService 在哪里定义"` |
+| 1 | 图谱 | 找文件/符号/依赖/影响范围/文档/规则 | `graphify query "UserService 在哪里定义"` |
 | 2 | 结构化搜索 | 图谱无结果时的精确查找 | `grep -rn "symbol" <源码目录>/` |
 | 3 | Read 文件 | 已锁定目标后读内容 | Read tool |
 
@@ -106,13 +108,14 @@ paths:
 - 理解模块间的依赖链路
 - 查找 symbol / class / function 定义位置
 - 新需求开发前的代码探索
+- 查找项目文档、规则、设计决策（如 `graphify query "P1 数据隔离原则"`）
 
 ## 前置检查（强制）
 
 **在执行任何 `grep`/`find`/`Read` 搜索之前，必须先尝试 `graphify query`。**
 
 判断流程：
-1. 需要定位代码 → 先 `graphify query "问题"`
+1. 需要定位代码或文档 → 先 `graphify query "问题"`
 2. 图谱返回了相关文件 → 直接 Read，不走 grep
 3. 图谱无结果或结果不相关 → 降级到 grep/find
 4. 需要了解改动影响 → `graphify affected "文件/符号"`
@@ -170,6 +173,6 @@ paths:
 
 ## 效果
 
-- 代码搜索从多轮盲搜变为一次精准定位
+- 搜索从多轮盲搜变为一次精准定位（代码 + 文档 + 规则）
 - 减少 Agent 探索轮次，每次少一轮 = 少一次 API 请求 = 少一整个 context window 的 input token
 - 修复循环场景下，收益被轮次数放大

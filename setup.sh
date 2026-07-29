@@ -114,17 +114,17 @@ if [ -f "$GITIGNORE" ] && grep -qF "$GRAPHIFY_ENTRY" "$GITIGNORE" 2>/dev/null; t
 else
   {
     echo ""
-    echo "# Graphify 代码图谱索引（自动生成，不提交）"
+    echo "# Graphify 图谱索引（自动生成，不提交）"
     echo "$GRAPHIFY_ENTRY"
   } >> "$GITIGNORE"
   ok "已添加 graphify-out/ 到 .gitignore"
 fi
 
 # --- Step 6: 生成搜索规则 ---
-info "Step 6/7: 生成代码搜索规则..."
+info "Step 6/7: 生成搜索规则..."
 
 RULES_DIR=".claude/rules"
-RULE_FILE="$RULES_DIR/code-search.md"
+RULE_FILE="$RULES_DIR/search.md"
 
 mkdir -p "$RULES_DIR"
 
@@ -187,13 +187,15 @@ paths:
 $(echo -e "$PATHS")
 ---
 
-# Agent 搜索策略：代码图谱优先
+# Agent 搜索策略：图谱优先
+
+> Graphify 图谱索引代码 + 文档 + 规则，用 AST + 语义索引替代盲搜。
 
 ## 搜索优先级
 
 | 优先级 | 方式 | 适用场景 | 命令示例 |
 |--------|------|---------|---------|
-| 1 | 代码图谱 | 找文件/符号/依赖/影响范围 | \`graphify query "UserService 在哪里定义"\` |
+| 1 | 图谱 | 找文件/符号/依赖/影响范围/文档/规则 | \`graphify query "UserService 在哪里定义"\` |
 | 2 | 结构化搜索 | 图谱无结果时的精确查找 | \`grep -rn "symbol" <源码目录>/\` |
 | 3 | Read 文件 | 已锁定目标后读内容 | Read tool |
 
@@ -209,6 +211,7 @@ $(echo -e "$PATHS")
 - 理解模块间的依赖链路
 - 查找 symbol / class / function 定义位置
 - 新需求开发前的代码探索
+- 查找项目文档、规则、设计决策（如 \`graphify query "P1 数据隔离原则"\`）
 
 ## 图谱不可用时
 
@@ -288,7 +291,7 @@ echo "  ✓ graphify 代码图谱"
 echo "  ✓ AST 索引 (graphify-out/)"
 echo "  ✓ Git Hook (自动增量更新)"
 echo "  ✓ .gitignore (排除索引目录)"
-echo "  ✓ 搜索规则 (.claude/rules/code-search.md)"
+echo "  ✓ 搜索规则 (.claude/rules/search.md)"
 echo "  ✓ Claude Code 插件 marketplace"
 echo ""
 echo "还需要在 Claude Code 中执行一次（仅首次）:"

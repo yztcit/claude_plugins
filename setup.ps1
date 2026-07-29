@@ -60,7 +60,7 @@ if (Get-Command graphify -ErrorAction SilentlyContinue) {
 }
 
 # --- Step 3: 初始化索引 ---
-Write-Info "Step 3/7: 初始化代码图谱索引..."
+Write-Info "Step 3/7: 初始化图谱索引..."
 
 if ((Test-Path "graphify-out") -and (Get-ChildItem "graphify-out" -ErrorAction SilentlyContinue)) {
     Write-Ok "图谱索引已存在，跳过初始化"
@@ -86,16 +86,16 @@ if ((Test-Path $gitignorePath) -and (Select-String -Path $gitignorePath -Pattern
     Write-Ok ".gitignore 已包含 graphify-out/ 排除规则"
 } else {
     Add-Content -Path $gitignorePath -Value ""
-    Add-Content -Path $gitignorePath -Value "# Graphify 代码图谱索引（自动生成，不提交）"
+    Add-Content -Path $gitignorePath -Value "# Graphify 图谱索引（自动生成，不提交）"
     Add-Content -Path $gitignorePath -Value $graphifyEntry
     Write-Ok "已添加 graphify-out/ 到 .gitignore"
 }
 
 # --- Step 6: 生成搜索规则 ---
-Write-Info "Step 6/7: 生成代码搜索规则..."
+Write-Info "Step 6/7: 生成搜索规则..."
 
 $rulesDir = ".claude\rules"
-$ruleFile = "$rulesDir\code-search.md"
+$ruleFile = "$rulesDir\search.md"
 
 if (-not (Test-Path $rulesDir)) {
     New-Item -ItemType Directory -Path $rulesDir -Force | Out-Null
@@ -146,13 +146,15 @@ paths:
 $pathsStr
 ---
 
-# Agent 搜索策略：代码图谱优先
+# Agent 搜索策略：图谱优先
+
+> Graphify 图谱索引代码 + 文档 + 规则，用 AST + 语义索引替代盲搜。
 
 ## 搜索优先级
 
 | 优先级 | 方式 | 适用场景 | 命令示例 |
 |--------|------|---------|---------|
-| 1 | 代码图谱 | 找文件/符号/依赖/影响范围 | ``graphify query "UserService 在哪里定义"`` |
+| 1 | 图谱 | 找文件/符号/依赖/影响范围/文档/规则 | ``graphify query "UserService 在哪里定义"`` |
 | 2 | 结构化搜索 | 图谱无结果时的精确查找 | ``grep -rn "symbol" <源码目录>/`` |
 | 3 | Read 文件 | 已锁定目标后读内容 | Read tool |
 
@@ -168,6 +170,7 @@ $pathsStr
 - 理解模块间的依赖链路
 - 查找 symbol / class / function 定义位置
 - 新需求开发前的代码探索
+- 查找项目文档、规则、设计决策（如 ``graphify query "P1 数据隔离原则"``）
 
 ## 图谱不可用时
 
@@ -242,15 +245,15 @@ Write-Host "========================================"
 Write-Host ""
 Write-Host "已完成的配置:"
 Write-Host "  ✓ uv 包管理器"
-Write-Host "  ✓ graphify 代码图谱"
+Write-Host "  ✓ graphify 图谱"
 Write-Host "  ✓ AST 索引 (graphify-out/)"
 Write-Host "  ✓ Git Hook (自动增量更新)"
 Write-Host "  ✓ .gitignore (排除索引目录)"
-Write-Host "  ✓ 搜索规则 (.claude/rules/code-search.md)"
+Write-Host "  ✓ 搜索规则 (.claude/rules/search.md)"
 Write-Host "  ✓ Claude Code 插件 marketplace"
 Write-Host ""
 Write-Host "还需要在 Claude Code 中执行一次（仅首次）:"
 Write-Host "  /plugin install dev@lui-tools --scope project"
 Write-Host ""
-Write-Host "之后 Agent 搜索代码时会自动优先使用图谱。"
+Write-Host "之后 Agent 搜索时会自动优先使用图谱（代码 + 文档 + 规则）。"
 Write-Host ""

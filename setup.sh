@@ -103,12 +103,13 @@ info "Step 4/7: 绑定 Git Hook (post-commit + post-checkout)..."
 graphify hook install
 ok "Git Hook 绑定完成"
 
-# --- Step 5: 配置 .gitignore ---
-info "Step 5/7: 配置 .gitignore..."
+# --- Step 5: 配置 .gitignore 和 .git/info/exclude ---
+info "Step 5/7: 配置 .gitignore 和 .git/info/exclude..."
 
 GITIGNORE=".gitignore"
 GRAPHIFY_ENTRY="graphify-out/"
 
+# .gitignore
 if [ -f "$GITIGNORE" ] && grep -qF "$GRAPHIFY_ENTRY" "$GITIGNORE" 2>/dev/null; then
   ok ".gitignore 已包含 graphify-out/ 排除规则"
 else
@@ -118,6 +119,52 @@ else
     echo "$GRAPHIFY_ENTRY"
   } >> "$GITIGNORE"
   ok "已添加 graphify-out/ 到 .gitignore"
+fi
+
+# .git/info/exclude
+EXCLUDE_FILE=".git/info/exclude"
+EXCLUDE_MODE="${CLAUDE_EXCLUDE_MODE:-minimal}"
+
+mkdir -p "$(dirname "$EXCLUDE_FILE")"
+touch "$EXCLUDE_FILE"
+
+add_exclude_entry() {
+  local entry="$1"
+  if ! grep -qxF "$entry" "$EXCLUDE_FILE" 2>/dev/null; then
+    echo "$entry" >> "$EXCLUDE_FILE"
+    return 0
+  fi
+  return 1
+}
+
+EXCLUDE_ADDED=0
+
+# 始终添加：自动生成产物
+if ! grep -qxF "# Graphify 图谱索引（自动生成，不提交）" "$EXCLUDE_FILE" 2>/dev/null; then
+  echo "# Graphify 图谱索引（自动生成，不提交）" >> "$EXCLUDE_FILE"
+fi
+if add_exclude_entry "graphify-out/"; then ((EXCLUDE_ADDED++)) || true; fi
+if add_exclude_entry ".gitattributes"; then ((EXCLUDE_ADDED++)) || true; fi
+
+if [ "$EXCLUDE_ADDED" -gt 0 ]; then
+  ok "已添加 graphify-out/ 和 .gitattributes 到 .git/info/exclude"
+else
+  ok ".git/info/exclude 已包含自动生成产物排除规则"
+fi
+
+# 可选：排除 .claude/ 和 CLAUDE.md
+if [ "$EXCLUDE_MODE" = "all" ]; then
+  OPT_ADDED=0
+  if add_exclude_entry ".claude/"; then ((OPT_ADDED++)) || true; fi
+  if add_exclude_entry "CLAUDE.md"; then ((OPT_ADDED++)) || true; fi
+  if [ "$OPT_ADDED" -gt 0 ]; then
+    ok "已添加 .claude/ 和 CLAUDE.md 到 .git/info/exclude"
+  else
+    ok ".git/info/exclude 已包含 .claude/ 和 CLAUDE.md"
+  fi
+  info "提示: 如需团队共享插件配置，可移除 .claude/ 的 exclude 条目"
+else
+  info "如需同时忽略 .claude/ 和 CLAUDE.md，设置 CLAUDE_EXCLUDE_MODE=all 重新运行"
 fi
 
 # --- Step 6: 生成搜索规则 ---
@@ -291,6 +338,7 @@ echo "  ✓ graphify 代码图谱"
 echo "  ✓ AST 索引 (graphify-out/)"
 echo "  ✓ Git Hook (自动增量更新)"
 echo "  ✓ .gitignore (排除索引目录)"
+echo "  ✓ .git/info/exclude (排除自动生成产物)"
 echo "  ✓ 搜索规则 (.claude/rules/search.md)"
 echo "  ✓ Claude Code 插件 marketplace"
 echo ""

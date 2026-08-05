@@ -76,12 +76,13 @@ Write-Info "Step 4/7: 绑定 Git Hook (post-commit + post-checkout)..."
 graphify hook install
 Write-Ok "Git Hook 绑定完成"
 
-# --- Step 5: 配置 .gitignore ---
-Write-Info "Step 5/7: 配置 .gitignore..."
+# --- Step 5: 配置 .gitignore 和 .git/info/exclude ---
+Write-Info "Step 5/7: 配置 .gitignore 和 .git/info/exclude..."
 
 $gitignorePath = ".gitignore"
 $graphifyEntry = "graphify-out/"
 
+# .gitignore
 if ((Test-Path $gitignorePath) -and (Select-String -Path $gitignorePath -Pattern $graphifyEntry -SimpleMatch -Quiet)) {
     Write-Ok ".gitignore 已包含 graphify-out/ 排除规则"
 } else {
@@ -89,6 +90,57 @@ if ((Test-Path $gitignorePath) -and (Select-String -Path $gitignorePath -Pattern
     Add-Content -Path $gitignorePath -Value "# Graphify 图谱索引（自动生成，不提交）"
     Add-Content -Path $gitignorePath -Value $graphifyEntry
     Write-Ok "已添加 graphify-out/ 到 .gitignore"
+}
+
+# .git/info/exclude
+$excludePath = ".git\info\exclude"
+$excludeMode = if ($env:CLAUDE_EXCLUDE_MODE) { $env:CLAUDE_EXCLUDE_MODE } else { "minimal" }
+
+$excludeDir = Split-Path $excludePath -Parent
+if (-not (Test-Path $excludeDir)) {
+    New-Item -ItemType Directory -Path $excludeDir -Force | Out-Null
+}
+if (-not (Test-Path $excludePath)) {
+    New-Item -ItemType File -Path $excludePath -Force | Out-Null
+}
+
+function Add-ExcludeEntry {
+    param([string]$Entry)
+    $content = Get-Content $excludePath -Encoding UTF8 -ErrorAction SilentlyContinue
+    if ($content -contains $Entry) {
+        return $false
+    }
+    Add-Content -Path $excludePath -Value $Entry -Encoding UTF8
+    return $true
+}
+
+$excludeAdded = 0
+
+# 始终添加：自动生成产物
+$comment = "# Graphify 图谱索引（自动生成，不提交）"
+Add-ExcludeEntry $comment | Out-Null
+if (Add-ExcludeEntry "graphify-out/") { $excludeAdded++ }
+if (Add-ExcludeEntry ".gitattributes") { $excludeAdded++ }
+
+if ($excludeAdded -gt 0) {
+    Write-Ok "已添加 graphify-out/ 和 .gitattributes 到 .git/info/exclude"
+} else {
+    Write-Ok ".git/info/exclude 已包含自动生成产物排除规则"
+}
+
+# 可选：排除 .claude/ 和 CLAUDE.md
+if ($excludeMode -eq "all") {
+    $optAdded = 0
+    if (Add-ExcludeEntry ".claude/") { $optAdded++ }
+    if (Add-ExcludeEntry "CLAUDE.md") { $optAdded++ }
+    if ($optAdded -gt 0) {
+        Write-Ok "已添加 .claude/ 和 CLAUDE.md 到 .git/info/exclude"
+    } else {
+        Write-Ok ".git/info/exclude 已包含 .claude/ 和 CLAUDE.md"
+    }
+    Write-Info "提示: 如需团队共享插件配置，可移除 .claude/ 的 exclude 条目"
+} else {
+    Write-Info "如需同时忽略 .claude/ 和 CLAUDE.md，设置 `$env:CLAUDE_EXCLUDE_MODE='all' 重新运行"
 }
 
 # --- Step 6: 生成搜索规则 ---
@@ -249,6 +301,7 @@ Write-Host "  ✓ graphify 图谱"
 Write-Host "  ✓ AST 索引 (graphify-out/)"
 Write-Host "  ✓ Git Hook (自动增量更新)"
 Write-Host "  ✓ .gitignore (排除索引目录)"
+Write-Host "  ✓ .git/info/exclude (排除自动生成产物)"
 Write-Host "  ✓ 搜索规则 (.claude/rules/search.md)"
 Write-Host "  ✓ Claude Code 插件 marketplace"
 Write-Host ""

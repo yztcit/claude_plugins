@@ -31,7 +31,31 @@ curl -LsSf https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.sh
 irm https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.ps1 | iex
 ```
 
-脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .gitignore → 探测项目结构并生成搜索规则 → 配置 Claude Code 插件 marketplace
+脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .gitignore 和 .git/info/exclude → 探测项目结构并生成搜索规则 → 配置 Claude Code 插件 marketplace
+
+#### .git/info/exclude 配置
+
+脚本默认将自动生成产物添加到 `.git/info/exclude`（不影响 `.gitignore`，不提交到仓库）：
+
+```
+# Graphify 图谱索引（自动生成，不提交）
+graphify-out/
+.gitattributes
+```
+
+如需同时忽略 `.claude/` 和 `CLAUDE.md`（个人配置，不共享给团队），设置环境变量后运行：
+
+**macOS / Linux：**
+```bash
+CLAUDE_EXCLUDE_MODE=all curl -LsSf https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.sh | bash
+```
+
+**Windows (PowerShell)：**
+```powershell
+$env:CLAUDE_EXCLUDE_MODE="all"; irm https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.ps1 | iex
+```
+
+> 默认 `CLAUDE_EXCLUDE_MODE=minimal`，仅忽略自动生成产物。设为 `all` 会额外忽略 `.claude/`（插件配置目录）和 `CLAUDE.md`（项目记忆文件）。如需团队共享插件配置，保持默认即可。
 
 > **网络超时？** 安装 uv 和 graphify 需要从 GitHub 下载，国内网络可能超时。执行脚本前先配置终端代理（一次性，关闭终端即失效）：
 >

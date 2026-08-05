@@ -178,62 +178,7 @@ mkdir -p "$RULES_DIR"
 if [ -f "$RULE_FILE" ]; then
   ok "规则文件已存在，跳过生成"
 else
-  # 探测项目源码结构
-  info "探测项目结构..."
-
-  PATHS=""
-
-  # 扫描各目录的源码文件，统计目录+扩展名
-  # 排除常见非源码目录
-  EXCLUDE_DIRS="node_modules|\.git|dist|build|graphify|\.claude|vendor|__pycache__|\.venv|target|bin|obj"
-
-  # 找源码文件，统计 top 目录 + 扩展名组合
-  SCAN_RESULT=$(find . -type f \( \
-    -name "*.ts" -o -name "*.tsx" -o -name "*.vue" -o -name "*.js" -o -name "*.jsx" \
-    -o -name "*.py" -o -name "*.go" -o -name "*.java" -o -name "*.rs" -o -name "*.swift" \
-    -o -name "*.rb" -o -name "*.php" -o -name "*.cs" -o -name "*.kt" -o -name "*.scala" \
-  \) -not -path "*/node_modules/*" \
-     -not -path "*/.git/*" \
-     -not -path "*/dist/*" \
-     -not -path "*/build/*" \
-     -not -path "*/graphify-out/*" \
-     -not -path "*/.claude/*" \
-     -not -path "*/vendor/*" \
-     -not -path "*/__pycache__/*" \
-     -not -path "*/.venv/*" \
-     -not -path "*/target/*" \
-     -not -path "*/bin/*" \
-     -not -path "*/obj/*" \
-    2>/dev/null | head -200)
-
-  if [ -z "$SCAN_RESULT" ]; then
-    warn "未检测到源码文件，使用通用路径配置"
-    PATHS='  - "src/**/*"\n  - "lib/**/*"'
-  else
-    # 提取一级目录 + 扩展名，去重
-    PATHS=$(echo "$SCAN_RESULT" | \
-      sed 's|^\./||' | \
-      awk -F'/' '{
-        if (NF > 1) dir = $1; else dir = ".";
-        n = split($NF, a, ".");
-        if (n > 1) ext = a[n]; else ext = "";
-        if (ext != "") print dir " " ext
-      }' | \
-      sort -u | \
-      awk '{
-        if ($1 == ".") printf "  - \"**/*." $2 "\"\n";
-        else printf "  - \"" $1 "/**/*." $2 "\"\n";
-      }' | \
-      sort -u | \
-      head -10)
-  fi
-
-  cat > "$RULE_FILE" << RULEEOF
----
-paths:
-$(echo -e "$PATHS")
----
-
+  cat > "$RULE_FILE" << 'RULEEOF'
 # 搜索策略：图谱优先
 
 > Graphify 图谱索引代码 + 文档 + 规则，用 AST + 语义索引替代盲搜。
@@ -271,8 +216,6 @@ $(echo -e "$PATHS")
 RULEEOF
 
   ok "规则文件已生成: $RULE_FILE"
-  info "生成的 paths 配置:"
-  echo -e "$PATHS" | sed 's/^/  /'
 fi
 
 # --- Step 7: 配置 Claude Code 插件 ---
@@ -345,5 +288,5 @@ echo ""
 echo "还需要在 Claude Code 中执行一次（仅首次）:"
 echo "  /plugin install dev@lui-tools --scope project"
 echo ""
-echo "之后 Agent 搜索代码时会自动优先使用图谱。"
+echo "之后搜索代码时会自动优先使用图谱（代码 + 文档 + 规则）。"
 echo ""

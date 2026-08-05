@@ -156,48 +156,7 @@ if (-not (Test-Path $rulesDir)) {
 if (Test-Path $ruleFile) {
     Write-Ok "规则文件已存在，跳过生成"
 } else {
-    Write-Info "探测项目结构..."
-
-    # 扫描源码文件
-    $excludeDirs = @("node_modules", ".git", "dist", "build", "graphify-out", ".claude", "vendor", "__pycache__", ".venv", "target", "bin", "obj")
-    $extensions = @("*.ts", "*.tsx", "*.vue", "*.js", "*.jsx", "*.py", "*.go", "*.java", "*.rs", "*.swift", "*.rb", "*.php", "*.cs", "*.kt", "*.scala")
-
-    $sourceFiles = Get-ChildItem -Path . -Include $extensions -Recurse -File -ErrorAction SilentlyContinue |
-        Where-Object {
-            $path = $_.FullName
-            -not ($excludeDirs | Where-Object { $path -like "*\$_\*" -or $path -like "*/$_/*" })
-        } |
-        Select-Object -First 200
-
-    if (-not $sourceFiles -or $sourceFiles.Count -eq 0) {
-        Write-Warn "未检测到源码文件，使用通用路径配置"
-        $paths = @('  - "src/**/*"', '  - "lib/**/*"')
-    } else {
-        $pathSet = @{}
-        foreach ($file in $sourceFiles) {
-            $relativePath = $file.FullName.Substring((Get-Location).Path.Length + 1).Replace("\", "/")
-            $parts = $relativePath.Split("/")
-            $dir = if ($parts.Count -gt 1) { $parts[0] } else { "." }
-            $ext = $file.Extension.TrimStart(".")
-            if ($ext) {
-                $key = "$dir $ext"
-                $pathSet[$key] = $true
-            }
-        }
-        $paths = $pathSet.Keys | Sort-Object | Select-Object -First 10 | ForEach-Object {
-            $d, $e = $_.Split(" ")
-            if ($d -eq ".") { "  - `"**/*.$e`"" } else { "  - `"$d/**/*.$e`"" }
-        }
-    }
-
-    $pathsStr = $paths -join "`n"
-
     $ruleContent = @"
----
-paths:
-$pathsStr
----
-
 # 搜索策略：图谱优先
 
 > Graphify 图谱索引代码 + 文档 + 规则，用 AST + 语义索引替代盲搜。
@@ -236,8 +195,6 @@ $pathsStr
 
     Set-Content -Path $ruleFile -Value $ruleContent -Encoding UTF8
     Write-Ok "规则文件已生成: $ruleFile"
-    Write-Info "生成的 paths 配置:"
-    $paths | ForEach-Object { Write-Host "  $_" }
 }
 
 # --- Step 7: 配置 Claude Code 插件 ---
@@ -308,5 +265,5 @@ Write-Host ""
 Write-Host "还需要在 Claude Code 中执行一次（仅首次）:"
 Write-Host "  /plugin install dev@lui-tools --scope project"
 Write-Host ""
-Write-Host "之后 Agent 搜索时会自动优先使用图谱（代码 + 文档 + 规则）。"
+Write-Host "之后搜索时会自动优先使用图谱（代码 + 文档 + 规则）。"
 Write-Host ""

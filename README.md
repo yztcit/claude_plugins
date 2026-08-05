@@ -31,7 +31,7 @@ curl -LsSf https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.sh
 irm https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.ps1 | iex
 ```
 
-脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .gitignore 和 .git/info/exclude → 生成搜索规则（图谱优先，全局生效） → 配置 Claude Code 插件 marketplace
+脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .git/info/exclude → 生成搜索规则（图谱优先，全局生效） → 配置 Claude Code 插件 marketplace
 
 #### .git/info/exclude 配置
 

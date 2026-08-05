@@ -76,23 +76,8 @@ Write-Info "Step 4/7: 绑定 Git Hook (post-commit + post-checkout)..."
 graphify hook install
 Write-Ok "Git Hook 绑定完成"
 
-# --- Step 5: 配置 .gitignore 和 .git/info/exclude ---
-Write-Info "Step 5/7: 配置 .gitignore 和 .git/info/exclude..."
-
-$gitignorePath = ".gitignore"
-$graphifyEntry = "graphify-out/"
-
-# .gitignore
-if ((Test-Path $gitignorePath) -and (Select-String -Path $gitignorePath -Pattern $graphifyEntry -SimpleMatch -Quiet)) {
-    Write-Ok ".gitignore 已包含 graphify-out/ 排除规则"
-} else {
-    Add-Content -Path $gitignorePath -Value ""
-    Add-Content -Path $gitignorePath -Value "# Graphify 图谱索引（自动生成，不提交）"
-    Add-Content -Path $gitignorePath -Value $graphifyEntry
-    Write-Ok "已添加 graphify-out/ 到 .gitignore"
-}
-
-# .git/info/exclude
+# --- Step 5: 配置 .git/info/exclude ---
+Write-Info "Step 5/7: 配置 .git/info/exclude..."
 $excludePath = ".git\info\exclude"
 $excludeMode = if ($env:CLAUDE_EXCLUDE_MODE) { $env:CLAUDE_EXCLUDE_MODE } else { "minimal" }
 
@@ -257,7 +242,6 @@ Write-Host "  ✓ uv 包管理器"
 Write-Host "  ✓ graphify 图谱"
 Write-Host "  ✓ AST 索引 (graphify-out/)"
 Write-Host "  ✓ Git Hook (自动增量更新)"
-Write-Host "  ✓ .gitignore (排除索引目录)"
 Write-Host "  ✓ .git/info/exclude (排除自动生成产物)"
 Write-Host "  ✓ 搜索规则 (.claude/rules/search.md)"
 Write-Host "  ✓ Claude Code 插件 marketplace"

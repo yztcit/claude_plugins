@@ -103,25 +103,8 @@ info "Step 4/7: 绑定 Git Hook (post-commit + post-checkout)..."
 graphify hook install
 ok "Git Hook 绑定完成"
 
-# --- Step 5: 配置 .gitignore 和 .git/info/exclude ---
-info "Step 5/7: 配置 .gitignore 和 .git/info/exclude..."
-
-GITIGNORE=".gitignore"
-GRAPHIFY_ENTRY="graphify-out/"
-
-# .gitignore
-if [ -f "$GITIGNORE" ] && grep -qF "$GRAPHIFY_ENTRY" "$GITIGNORE" 2>/dev/null; then
-  ok ".gitignore 已包含 graphify-out/ 排除规则"
-else
-  {
-    echo ""
-    echo "# Graphify 图谱索引（自动生成，不提交）"
-    echo "$GRAPHIFY_ENTRY"
-  } >> "$GITIGNORE"
-  ok "已添加 graphify-out/ 到 .gitignore"
-fi
-
-# .git/info/exclude
+# --- Step 5: 配置 .git/info/exclude ---
+info "Step 5/7: 配置 .git/info/exclude..."
 EXCLUDE_FILE=".git/info/exclude"
 EXCLUDE_MODE="${CLAUDE_EXCLUDE_MODE:-minimal}"
 
@@ -280,7 +263,6 @@ echo "  ✓ uv 包管理器"
 echo "  ✓ graphify 代码图谱"
 echo "  ✓ AST 索引 (graphify-out/)"
 echo "  ✓ Git Hook (自动增量更新)"
-echo "  ✓ .gitignore (排除索引目录)"
 echo "  ✓ .git/info/exclude (排除自动生成产物)"
 echo "  ✓ 搜索规则 (.claude/rules/search.md)"
 echo "  ✓ Claude Code 插件 marketplace"

@@ -198,7 +198,7 @@ paths:
 $pathsStr
 ---
 
-# Agent 搜索策略：图谱优先
+# 搜索策略：图谱优先
 
 > Graphify 图谱索引代码 + 文档 + 规则，用 AST + 语义索引替代盲搜。
 
@@ -206,15 +206,15 @@ $pathsStr
 
 | 优先级 | 方式 | 适用场景 | 命令示例 |
 |--------|------|---------|---------|
-| 1 | 图谱 | 找文件/符号/依赖/影响范围/文档/规则 | ``graphify query "UserService 在哪里定义"`` |
-| 2 | 结构化搜索 | 图谱无结果时的精确查找 | ``grep -rn "symbol" <源码目录>/`` |
+| 1 | 图谱 | 找文件/符号/依赖/影响范围/文档/规则 | `graphify query "UserService 在哪里定义"` |
+| 2 | 结构化搜索 | 图谱无结果时的精确查找 | `grep -rn "symbol" <源码目录>/` |
 | 3 | Read 文件 | 已锁定目标后读内容 | Read tool |
 
 ## 搜索流程
 
-1. **先查图谱锁定文件** — ``graphify query "<问题>"`` 获取相关文件列表和关系
+1. **先查图谱锁定文件** — `graphify query "<问题>"` 获取相关文件列表和关系
 2. **再 Read 目标文件** — 只读图谱锁定的文件，不做盲搜式多轮 read
-3. **查影响范围** — ``graphify affected "<改动的文件/符号>"`` 了解上下游，避免改一处漏一片
+3. **查影响范围** — `graphify affected "<改动的文件/符号>"` 了解上下游，避免改一处漏一片
 
 ## 适用场景
 
@@ -222,16 +222,16 @@ $pathsStr
 - 理解模块间的依赖链路
 - 查找 symbol / class / function 定义位置
 - 新需求开发前的代码探索
-- 查找项目文档、规则、设计决策（如 ``graphify query "P1 数据隔离原则"``）
+- 查找项目文档、规则、设计决策（如 `graphify query "P1 数据隔离原则"`）
 
 ## 图谱不可用时
 
-若 ``graphify`` 命令不存在或索引未建，按传统方式搜索（find/grep → read）。
+若 `graphify` 命令不存在或索引未建，按传统方式搜索（find/grep → read）。
 
 ## 禁止事项
 
 - 图谱可用时不做多轮关键词盲搜
-- 不将 ``graphify-out/`` 目录提交到 git
+- 不将 `graphify-out/` 目录提交到 git
 "@
 
     Set-Content -Path $ruleFile -Value $ruleContent -Encoding UTF8

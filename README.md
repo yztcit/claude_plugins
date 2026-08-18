@@ -86,12 +86,31 @@ $env:CLAUDE_EXCLUDE_MODE="all"; irm https://raw.githubusercontent.com/yztcit/cla
 
 1. 终端执行一次 `setup.sh`（安装工具链 + 索引）
 2. Claude Code 中执行 `/plugin install dev@lui-tools`（激活插件）
-3. 之后无需任何操作，`/plugin update` 自动拉取更新
 
 ### 更新插件
 
+插件更新分两步：**先刷新 marketplace 缓存，再更新插件**。只执行 `/plugin update` 不会刷新 marketplace 元数据，会一直读到旧版本。
+
+```bash
+# 1. 刷新 lui-tools marketplace 缓存到远程最新
+claude plugin marketplace update lui-tools
+
+# 2. 更新已安装插件到最新版本（project scope；user scope 用 -s user）
+claude plugin update dev@lui-tools -s project
 ```
-/plugin update
+
+然后**重启 Claude Code 会话**使新 skill/agent 生效。
+
+或用一键脚本（免下载执行，推荐）：
+
+**macOS / Linux：**
+```bash
+curl -LsSf https://raw.githubusercontent.com/yztcit/claude_plugins/main/update-plugins.sh | bash
+```
+
+**Windows (PowerShell)：**
+```powershell
+irm https://raw.githubusercontent.com/yztcit/claude_plugins/main/update-plugins.ps1 | iex
 ```
 
 ## 创建项目规范（按需）

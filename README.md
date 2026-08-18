@@ -1,6 +1,6 @@
 # claude_plugins
 
-通用 Claude Code 研发工具集插件仓库。一个 `dev` 插件，打包 5 个 Skill + 5 个 Agent。
+通用 Claude Code 研发工具集插件仓库。一个 `dev` 插件，打包 6 个 Skill + 5 个 Agent。
 
 ## 插件内容
 
@@ -11,6 +11,7 @@
 | `gen-commit` | Skill | 根据提交历史，生成符合项目规范的提交信息 | `/dev:gen-commit` |
 | `graphify-search` | Skill | 一键接入 Graphify 代码图谱：安装→索引→git hook→注入搜索规则 | `/dev:graphify-search` |
 | `code-review` | Skill | 并行代码审查（bug 猎手 + 简化专家），带置信度分级 | `/dev:code-review` |
+| `module-docs` | Skill | 业务模块知识沉淀为领域 agent 文档，并注入通用规则 | `/dev:module-docs` |
 | `code-reviewer` | Agent | Bug 猎手：正确性、安全性、可维护性、架构合规 | dev-flow / code-review 调用 |
 | `code-simplifier` | Agent | 简化专家：重复代码、过度工程、死代码、抽象泄漏 | code-review 调用 |
 | `feature-developer` | Agent | 功能实施：按方案编写代码，遵循项目规范 | dev-flow 自动调用 |
@@ -31,7 +32,7 @@ curl -LsSf https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.sh
 irm https://raw.githubusercontent.com/yztcit/claude_plugins/main/setup.ps1 | iex
 ```
 
-脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .git/info/exclude → 生成搜索规则（图谱优先，全局生效） → 配置 Claude Code 插件 marketplace
+脚本自动完成：安装 uv → 安装 graphify → 初始化代码图谱索引 → 绑定 git hook（自动增量更新） → 配置 .git/info/exclude → 下载搜索规则（图谱优先，规则单源 `search-rule.md`） → 配置 Claude Code 插件 marketplace
 
 #### .git/info/exclude 配置
 
@@ -111,7 +112,7 @@ $env:CLAUDE_EXCLUDE_MODE="all"; irm https://raw.githubusercontent.com/yztcit/cla
 /help
 ```
 
-应该看到 `dev:dev-flow`、`dev:solution-design`、`dev:gen-commit`、`dev:graphify-search`、`dev:code-review` 五个 Skill。
+应该看到 `dev:dev-flow`、`dev:solution-design`、`dev:gen-commit`、`dev:graphify-search`、`dev:code-review`、`dev:module-docs` 六个 Skill。
 
 验证图谱是否正常工作：
 
@@ -131,7 +132,7 @@ graphify search "一个你知道存在的类名"
 │  Plugin 层 (dev@lui-tools)        │
 │  Skill: dev-flow, solution-design  │
 │         gen-commit, graphify-search│
-│         code-review                │
+│         code-review, module-docs   │
 │  Agent: code-reviewer (bug hunter) │
 │         code-simplifier (simplifier)│
 │         feature-developer          │

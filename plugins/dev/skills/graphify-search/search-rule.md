@@ -12,6 +12,13 @@
 - `graphify update .` → 增量更新图谱（无需 LLM）
 - `graphify extract .` → 全量重建图谱（需 LLM API key）
 
+## 领域 agent 触发（模块知识优先）
+
+所在模块已沉淀领域 agent（`.claude/agents/<module>.md`，如 ai-eyes / xpy-interact）时：
+
+- **触发**：模块级改动 / 方案设计 / 链路排查 — 先触发对应领域 agent 拿架构与改动落点，再按需定向 grep/Read 验证；不要从头探索、重复检索 agent 文档已有知识
+- **不触发**：单点、目标明确的查找/修复 — 直接 grep/Read，避免无谓的 agent 开销
+
 ## 搜索方式选择（按查询类型分派）
 
 **不要无条件先查图谱。** 工具取决于查询类型：

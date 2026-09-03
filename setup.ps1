@@ -167,7 +167,7 @@ if (Test-Path $settingsFile) {
     if (-not $cfg.extraKnownMarketplaces) {
         $cfg | Add-Member -NotePropertyName "extraKnownMarketplaces" -NotePropertyValue @{} -Force
     }
-    $cfg.extraKnownMarketplaces | Add-Member -NotePropertyName "lui-tools" -NotePropertyValue @{
+    $cfg.extraKnownMarketplaces | Add-Member -NotePropertyName "tal-tools" -NotePropertyValue @{
         source = @{ source = "github"; repo = "yztcit/claude_plugins" }
     } -Force
 
@@ -175,7 +175,7 @@ if (Test-Path $settingsFile) {
     if (-not $cfg.enabledPlugins) {
         $cfg | Add-Member -NotePropertyName "enabledPlugins" -NotePropertyValue @{} -Force
     }
-    $cfg.enabledPlugins | Add-Member -NotePropertyName "dev@lui-tools" -NotePropertyValue $true -Force
+    $cfg.enabledPlugins | Add-Member -NotePropertyName "dev@tal-tools" -NotePropertyValue $true -Force
 
     $cfg | ConvertTo-Json -Depth 10 | Set-Content $settingsFile -Encoding UTF8
     Write-Ok "settings.json 已更新（marketplace + enabledPlugins）"
@@ -183,7 +183,7 @@ if (Test-Path $settingsFile) {
     $settingsContent = @'
 {
   "extraKnownMarketplaces": {
-    "lui-tools": {
+    "tal-tools": {
       "source": {
         "source": "github",
         "repo": "yztcit/claude_plugins"
@@ -191,7 +191,7 @@ if (Test-Path $settingsFile) {
     }
   },
   "enabledPlugins": {
-    "dev@lui-tools": true
+    "dev@tal-tools": true
   }
 }
 '@
@@ -215,7 +215,7 @@ Write-Host "  ✓ 搜索规则 (.claude/rules/search.md)"
 Write-Host "  ✓ Claude Code 插件 marketplace"
 Write-Host ""
 Write-Host "还需要在 Claude Code 中执行一次（仅首次）:"
-Write-Host "  /plugin install dev@lui-tools --scope project"
+Write-Host "  /plugin install dev@tal-tools --scope project"
 Write-Host ""
 Write-Host "之后搜索时会自动优先使用图谱（代码 + 文档 + 规则）。"
 Write-Host ""

@@ -184,13 +184,13 @@ with open('$SETTINGS_FILE', 'r') as f:
 
 # 添加 marketplace
 cfg.setdefault('extraKnownMarketplaces', {})
-cfg['extraKnownMarketplaces']['lui-tools'] = {
+cfg['extraKnownMarketplaces']['tal-tools'] = {
     'source': {'source': 'github', 'repo': 'yztcit/claude_plugins'}
 }
 
 # 添加 enabledPlugins
 cfg.setdefault('enabledPlugins', {})
-cfg['enabledPlugins']['dev@lui-tools'] = True
+cfg['enabledPlugins']['dev@tal-tools'] = True
 
 with open('$SETTINGS_FILE', 'w') as f:
     json.dump(cfg, f, indent=2)
@@ -205,7 +205,7 @@ else
   cat > "$SETTINGS_FILE" << 'SETTINGSEOF'
 {
   "extraKnownMarketplaces": {
-    "lui-tools": {
+    "tal-tools": {
       "source": {
         "source": "github",
         "repo": "yztcit/claude_plugins"
@@ -213,7 +213,7 @@ else
     }
   },
   "enabledPlugins": {
-    "dev@lui-tools": true
+    "dev@tal-tools": true
   }
 }
 SETTINGSEOF
@@ -236,7 +236,7 @@ echo "  ✓ 搜索规则 (.claude/rules/search.md)"
 echo "  ✓ Claude Code 插件 marketplace"
 echo ""
 echo "还需要在 Claude Code 中执行一次（仅首次）:"
-echo "  /plugin install dev@lui-tools --scope project"
+echo "  /plugin install dev@tal-tools --scope project"
 echo ""
 echo "之后搜索代码时会自动优先使用图谱（代码 + 文档 + 规则）。"
 echo ""

@@ -74,7 +74,7 @@ graphify-out/
 ```json
 {
   "extraKnownMarketplaces": {
-    "lui-tools": {
+    "tal-tools": {
       "source": {
         "source": "github",
         "repo": "yztcit/claude_plugins"
@@ -82,12 +82,12 @@ graphify-out/
     }
   },
   "enabledPlugins": {
-    "dev@lui-tools": true
+    "dev@tal-tools": true
   }
 }
 ```
 
-然后在 Claude Code 中执行一次 `/plugin install dev@lui-tools --scope project`。
+然后在 Claude Code 中执行一次 `/plugin install dev@tal-tools --scope project`。
 
 ## 验证
 

@@ -77,7 +77,7 @@ $env:CLAUDE_EXCLUDE_MODE="all"; irm https://raw.githubusercontent.com/yztcit/cla
 ### Step 2: Claude Code 中安装插件（激活 Skill + Agent）
 
 ```
-/plugin install dev@lui-tools --scope project
+/plugin install dev@tal-tools --scope project
 ```
 
 `--scope project` 会把安装记录写入 `.claude/settings.json`，`git push` 后其他队友就能共享。
@@ -85,18 +85,18 @@ $env:CLAUDE_EXCLUDE_MODE="all"; irm https://raw.githubusercontent.com/yztcit/cla
 ### 团队成员首次打开项目
 
 1. 终端执行一次 `setup.sh`（安装工具链 + 索引）
-2. Claude Code 中执行 `/plugin install dev@lui-tools`（激活插件）
+2. Claude Code 中执行 `/plugin install dev@tal-tools`（激活插件）
 
 ### 更新插件
 
 插件更新分两步：**先刷新 marketplace 缓存，再更新插件**。只执行 `/plugin update` 不会刷新 marketplace 元数据，会一直读到旧版本。
 
 ```bash
-# 1. 刷新 lui-tools marketplace 缓存到远程最新
-claude plugin marketplace update lui-tools
+# 1. 刷新 tal-tools marketplace 缓存到远程最新
+claude plugin marketplace update tal-tools
 
 # 2. 更新已安装插件到最新版本（project scope；user scope 用 -s user）
-claude plugin update dev@lui-tools -s project
+claude plugin update dev@tal-tools -s project
 ```
 
 然后**重启 Claude Code 会话**使新 skill/agent 生效。
@@ -148,7 +148,7 @@ graphify search "一个你知道存在的类名"
 │  rules/code-style.md               │
 │  rules/architecture.md             │
 ├────────────────────────────────────┤
-│  Plugin 层 (dev@lui-tools)        │
+│  Plugin 层 (dev@tal-tools)        │
 │  Skill: dev-flow, solution-design  │
 │         gen-commit, graphify-search│
 │         code-review, module-docs   │

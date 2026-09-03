@@ -1,7 +1,7 @@
 {
-  "name": "lui-tools",
+  "name": "tal-tools",
   "owner": {
-    "name": "LUI Team"
+    "name": "TAL"
   },
   "plugins": [
     {

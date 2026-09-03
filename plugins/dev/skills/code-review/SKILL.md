@@ -19,7 +19,7 @@ description: /dev:code-review — 并行代码审查（bug 猎手 + 简化专家
 
 ```
 如果没有指定范围:
-  files = `git diff --name-only`（仅 src/ 下的 .ts/.tsx/.vue/.js 文件）
+  files = `git diff --name-only`（当前仓库的变更文件，不限定扩展名）
   如果为空 → 提示用户"没有检测到变更"
 ```
 

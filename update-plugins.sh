@@ -28,13 +28,25 @@ echo "========================================"
 echo "  claude_plugins 插件更新"
 echo "========================================"
 
-# 目录内容指纹（相对路径 + 内容，排序后取摘要）。用于绕开版本号。
-dir_hash() {
-  local d="$1"
-  [ -d "$d" ] || { echo ""; return; }
-  (cd "$d" && find . -type f -not -path "./.git/*" | LC_ALL=C sort | while IFS= read -r f; do
-     printf '%s  ' "$f"; shasum -a 256 "$f" | cut -d' ' -f1
-   done) | shasum -a 256 | cut -d' ' -f1
+# 载荷比对：以「源」为准，逐文件校验缓存里是否存在且内容一致。
+# 输出差异描述（空 = 一致）。
+#
+# 为什么以源为准、而不是对两个目录各取一次摘要：缓存目录里会有 Claude Code 的
+# 运行时产物（如 .in_use/ 进程标记目录），源里没有 → 各取摘要必然不等 →
+# 每次都被判「内容已变」而强制重装。以源为准遍历则天然忽略缓存侧的额外文件。
+payload_diff() {
+  local src="$1" cache="$2" list
+  [ -d "$cache" ] || { echo "缓存目录不存在"; return; }
+  list=$(cd "$src" && find . -type f -not -path "./.git/*" | LC_ALL=C sort)
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    if [ ! -f "$cache/$f" ]; then
+      echo "缺失 $f"
+    elif [ "$(shasum -a 256 "$src/$f" | cut -d' ' -f1)" \
+       != "$(shasum -a 256 "$cache/$f" | cut -d' ' -f1)" ]; then
+      echo "内容不同 $f"
+    fi
+  done <<< "$list"
 }
 
 read_version() {
@@ -77,10 +89,12 @@ fi
 FORCE=0
 SRC_VER=$(read_version "$SRC")
 if [ -n "$SRC_VER" ] && [ -d "$CACHE_ROOT/$SRC_VER" ]; then
-  if [ "$(dir_hash "$SRC")" != "$(dir_hash "$CACHE_ROOT/$SRC_VER")" ]; then
+  DIFF=$(payload_diff "$SRC" "$CACHE_ROOT/$SRC_VER")
+  if [ -n "$DIFF" ]; then
     FORCE=1
     echo "[WARN] 版本号仍为 $SRC_VER 但内容已变（上游未 bump 版本）"
     echo "       常规 update 会判「已是最新」而静默空转 → 改走强制重装"
+    echo "$DIFF" | head -5 | sed 's/^/       /'
   else
     echo "[OK] 缓存内容与源一致（版本 $SRC_VER）"
   fi

@@ -30,23 +30,29 @@ Write-Host "========================================"
 Write-Host "  claude_plugins 插件更新"
 Write-Host "========================================"
 
-function Get-DirHash {
-    param([string]$Dir)
-    if (-not (Test-Path $Dir)) { return "" }
+# 载荷比对：以「源」为准，逐文件校验缓存里是否存在且内容一致。
+# 输出差异描述（空 = 一致）。
+#
+# 为什么以源为准、而不是对两个目录各取一次摘要：缓存目录里会有 Claude Code 的
+# 运行时产物（如 .in_use 进程标记），源里没有 → 各取摘要必然不等 →
+# 每次都被判「内容已变」而强制重装。以源为准遍历则天然忽略缓存侧的额外文件。
+function Get-PayloadDiff {
+    param([string]$Src, [string]$Cache)
+    if (-not (Test-Path $Cache)) { return "缓存目录不存在" }
     try {
-        $files = Get-ChildItem -Path $Dir -Recurse -File |
-                 Where-Object { $_.FullName -notmatch "\\\.git\\" } |
-                 Sort-Object FullName
-        if (-not $files) { return "" }
-        $lines = foreach ($f in $files) {
-            $rel = $f.FullName.Substring($Dir.Length).TrimStart("\", "/")
-            $hash = (Get-FileHash -Path $f.FullName -Algorithm SHA256).Hash
-            "$rel  $hash"
+        $files = Get-ChildItem -Path $Src -Recurse -File |
+                 Where-Object { $_.FullName -notmatch "\\\.git\\" }
+        $diffs = foreach ($f in $files) {
+            $rel = $f.FullName.Substring($Src.Length).TrimStart("\", "/")
+            $target = Join-Path $Cache $rel
+            if (-not (Test-Path $target -PathType Leaf)) {
+                "缺失 $rel"
+            } elseif ((Get-FileHash -Path $f.FullName -Algorithm SHA256).Hash -ne
+                      (Get-FileHash -Path $target -Algorithm SHA256).Hash) {
+                "内容不同 $rel"
+            }
         }
-        $joined = ($lines -join "`n")
-        $bytes = [System.Text.Encoding]::UTF8.GetBytes($joined)
-        $sha = [System.Security.Cryptography.SHA256]::Create()
-        return ([System.BitConverter]::ToString($sha.ComputeHash($bytes)) -replace "-", "")
+        return (($diffs | Where-Object { $_ }) -join "; ")
     } catch {
         return ""
     }
@@ -93,12 +99,12 @@ $Force = $false
 $SrcVer = Get-PluginVersion $Src
 $CacheVerDir = Join-Path $CacheRoot $SrcVer
 if ($SrcVer -and (Test-Path $CacheVerDir)) {
-    $srcHash = Get-DirHash $Src
-    $cacheHash = Get-DirHash $CacheVerDir
-    if ($srcHash -and $cacheHash -and ($srcHash -ne $cacheHash)) {
+    $diff = Get-PayloadDiff $Src $CacheVerDir
+    if ($diff) {
         $Force = $true
         Write-Host "[WARN] 版本号仍为 $SrcVer 但内容已变（上游未 bump 版本）"
         Write-Host "       常规 update 会判「已是最新」而静默空转 → 改走强制重装"
+        Write-Host "       $diff"
     } else {
         Write-Host "[OK] 缓存内容与源一致（版本 $SrcVer）"
     }

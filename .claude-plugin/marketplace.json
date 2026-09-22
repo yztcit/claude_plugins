@@ -1,5 +1,8 @@
 {
   "name": "tal-tools",
+  "metadata": {
+    "description": "TAL 团队共用的 Claude Code 研发工具集：dev 插件提供研发流程编排、方案设计、代码审查、提交信息生成、代码图谱接入与模块文档沉淀。"
+  },
   "owner": {
     "name": "TAL"
   },

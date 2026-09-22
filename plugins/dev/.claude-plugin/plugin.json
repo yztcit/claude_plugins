@@ -1,5 +1,8 @@
 {
   "name": "dev",
   "description": "通用研发工具集：dev-flow 研发流程、solution-design 方案设计、code-review 并行代码审查、gen-commit 提交信息生成、graphify-search 代码图谱接入、module-docs 模块文档沉淀",
+  "author": {
+    "name": "TAL"
+  },
   "version": "2.4.0"
 }

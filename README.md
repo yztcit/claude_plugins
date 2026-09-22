@@ -113,6 +113,23 @@ curl -LsSf https://raw.githubusercontent.com/yztcit/claude_plugins/main/update-p
 irm https://raw.githubusercontent.com/yztcit/claude_plugins/main/update-plugins.ps1 | iex
 ```
 
+> **为什么还需要脚本**：`claude plugin update` 是按 `plugin.json` 的 `version` 判「是否最新」的。上游改内容时若忘了 bump version，update 会判「已是最新」而**静默空转**，缓存里留着旧内容且没有任何报错（2026-09 实际发生过一次）。脚本会先比对「源目录 vs 缓存目录」的内容指纹，版本号相同但内容不同就走卸载重装强制刷新，不依赖上游的版本纪律。脚本只动**已安装**的 scope——不对未安装的 scope 执行 install，避免把插件凭空装到 user 级、绕过项目级 opt-in。
+
+### 存量迁移：marketplace 曾叫 `lui-tools`
+
+2026-09 本仓库的 marketplace 由 `lui-tools` 改名为 `tal-tools`。官方 `marketplace.json` 的 `renames` 字段只覆盖**插件改名**，覆盖不了 **marketplace 自身改名**，所以存量环境会卡在半迁移态（settings 写着新名但从未真正注册，插件仍挂旧名）。
+
+如果你的机器仍注册着 `lui-tools`，执行：
+
+```bash
+./migrate-lui-tools.sh --dry-run   # 先看计划
+./migrate-lui-tools.sh             # 执行（自动备份配置）
+```
+
+脚本会枚举受影响项目 → 备份配置 → 移除旧注册 → 注册新名 → 逐项目重装并改写 settings。
+
+> 注意 `claude plugin marketplace remove` 会**连带卸载**该 marketplace 下的所有插件并删除目录，不只是解注册——所以顺序不能颠倒，脚本已按正确顺序处理。
+
 ## 创建项目规范（按需）
 
 插件 Agent 依赖 `rules/` 中的规范来指导审查和实施。建议最少创建以下文件：

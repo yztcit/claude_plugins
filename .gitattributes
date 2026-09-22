@@ -1,4 +1,0 @@
-# 团队层资产的健康巡检决策：append-only JSONL，两人各自追加时用 union 合并，
-# 两边都不丢行（每行自带 decided_at 与 by，顺序无关）。落点由 ai-dev-kit 的
-# health/decision_log.py 按「决策跟随资产所属层」规则决定。
-.claude/health-decisions.jsonl merge=union
